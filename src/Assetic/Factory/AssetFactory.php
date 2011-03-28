@@ -99,6 +99,16 @@ class AssetFactory
     }
 
     /**
+     * Returns the filter manager.
+     *
+     * @return FilterManager|null The filter manager if set
+     */
+    public function getFilterManager()
+    {
+        return $this->fm;
+    }
+
+    /**
      * Creates a new asset.
      *
      * Prefixing a filter name with a question mark will cause it to be

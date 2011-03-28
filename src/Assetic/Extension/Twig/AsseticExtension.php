@@ -12,6 +12,7 @@
 namespace Assetic\Extension\Twig;
 
 use Assetic\Factory\AssetFactory;
+use Assetic\Extension\Twig\Filter\TwigFunction;
 
 class AsseticExtension extends \Twig_Extension
 {
@@ -31,6 +32,29 @@ class AsseticExtension extends \Twig_Extension
             new AsseticTokenParser($this->factory, 'stylesheets', 'css/*.css', $this->debug),
             new AsseticTokenParser($this->factory, 'image', 'images/*', $this->debug, true),
         );
+    }
+
+    /**
+     * Creates Twig functions for filters in the factory's filter manager.
+     *
+     * The filter must implement TwigFunction in order for a Twig
+     * function to be created.
+     */
+    public function getFunctions()
+    {
+        $functions = array();
+
+        if ($fm = $this->factory->getFilterManager()) {
+            foreach ($fm->getNames() as $name) {
+                $filter = $this->fm->get($name);
+                if ($filter instanceof TwigFunction) {
+                    $class = get_class($filter);
+                    $functions[$class::getTwigFunctionName()] = new \Twig_Function_Function($class.'::callFromTwig');
+                }
+            }
+        }
+
+        return $functions;
     }
 
     public function getName()
