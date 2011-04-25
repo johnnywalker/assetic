@@ -31,7 +31,8 @@ class TwigFormulaLoader implements FormulaLoaderInterface
     public function load(ResourceInterface $resource)
     {
         try {
-            $tokens = $this->twig->tokenize($resource->getContent());
+            $tokens = $this->twig->tokenize($resource->getContent(), 
+              static::getResourceName($resource));
             $nodes  = $this->twig->parse($tokens);
         } catch (\Exception $e) {
             return array();
@@ -68,5 +69,16 @@ class TwigFormulaLoader implements FormulaLoaderInterface
         }
 
         return $formulae;
+    }
+
+    /**
+     * Returns a unique name for the specified resource
+     *
+     * @param ResourceInterface $resource The resource for which a name is required
+     * @return string The resource's unique name
+     */
+    static protected function getResourceName(ResourceInterface $resource)
+    {
+        return (string) $resource;
     }
 }
