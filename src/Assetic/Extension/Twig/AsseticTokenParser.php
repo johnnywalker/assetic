@@ -21,6 +21,7 @@ class AsseticTokenParser extends \Twig_TokenParser
     private $output;
     private $single;
     private $extensions;
+    private $generic;
 
     /**
      * Constructor.
@@ -33,14 +34,16 @@ class AsseticTokenParser extends \Twig_TokenParser
      * @param string       $output     The default output string
      * @param Boolean      $single     Whether to force a single asset
      * @param array        $extensions Additional attribute names to look for
+     * @param Boolean      $generic    Whether this is a generic asset - type & template used
      */
-    public function __construct(AssetFactory $factory, $tag, $output, $single = false, array $extensions = array())
+    public function __construct(AssetFactory $factory, $tag, $output, $single = false, array $extensions = array(), $generic = false)
     {
         $this->factory    = $factory;
         $this->tag        = $tag;
         $this->output     = $output;
         $this->single     = $single;
         $this->extensions = $extensions;
+        $this->generic    = $generic;
     }
 
     public function parse(\Twig_Token $token)
@@ -52,6 +55,11 @@ class AsseticTokenParser extends \Twig_TokenParser
             'output'   => $this->output,
             'var_name' => 'asset_url',
         );
+        if ($this->generic) {
+            $type     = 'css';
+            $template = 'default';
+            $args     = null;
+        }
 
         $stream = $this->parser->getStream();
         while (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
@@ -83,6 +91,21 @@ class AsseticTokenParser extends \Twig_TokenParser
                 $stream->next();
                 $stream->expect(\Twig_Token::OPERATOR_TYPE, '=');
                 $attributes['debug'] = 'true' == $stream->expect(\Twig_Token::NAME_TYPE, array('true', 'false'))->getValue();
+            } elseif ($stream->test(\Twig_Token::NAME_TYPE, 'type') && $this->generic) {
+                // type='css'
+                $stream->next();
+                $stream->expect(\Twig_Token::OPERATOR_TYPE, '=');
+                $type = $stream->expect(\Twig_Token::STRING_TYPE, array('css', 'js', 'img'))->getValue();
+            } elseif ($stream->test(\Twig_Token::NAME_TYPE, 'template') && $this->generic) {
+                // template='default'
+                $stream->next();
+                $stream->expect(\Twig_Token::OPERATOR_TYPE, '=');
+                $template = $stream->expect(\Twig_Token::STRING_TYPE)->getValue();
+            } elseif ($stream->test(\Twig_Token::NAME_TYPE, 'args') && $this->generic) {
+                // args={'alt': 'this is an alt'}
+                $stream->next();
+                $stream->expect(\Twig_Token::OPERATOR_TYPE, '=');
+                $args = $this->parser->getExpressionParser()->parseHashExpression();
             } elseif ($stream->test(\Twig_Token::NAME_TYPE, $this->extensions)) {
                 // an arbitrary configured attribute
                 $key = $stream->next()->getValue();
@@ -96,11 +119,16 @@ class AsseticTokenParser extends \Twig_TokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        $endtag = 'end'.$this->getTag();
-        $test = function(\Twig_Token $token) use($endtag) { return $token->test($endtag); };
-        $body = $this->parser->subparse($test, true);
+        if ($this->generic) {
+            $body = new AsseticTemplateHelperNode($type, $template, $attributes['var_name'],
+                $args, $token->getLine(), $this->getTag());
+        } else {
+            $endtag = 'end'.$this->getTag();
+            $test = function(\Twig_Token $token) use($endtag) { return $token->test($endtag); };
+            $body = $this->parser->subparse($test, true);
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+            $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        }
 
         if ($this->single && 1 < count($inputs)) {
             $inputs = array_slice($inputs, -1);

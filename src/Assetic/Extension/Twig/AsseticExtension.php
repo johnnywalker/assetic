@@ -30,6 +30,8 @@ class AsseticExtension extends \Twig_Extension
             new AsseticTokenParser($this->factory, 'javascripts', 'js/*.js'),
             new AsseticTokenParser($this->factory, 'stylesheets', 'css/*.css'),
             new AsseticTokenParser($this->factory, 'image', 'images/*', true),
+            new AsseticTokenParser($this->factory, 'asset', 'css/*.css', false, array(), true),
+            new AsseticTemplateTokenParser('asset_template'),
         );
     }
 
