@@ -12,16 +12,18 @@
 namespace Assetic\Filter\Sass;
 
 /**
- * Loads SCSS files.
+ * Loads Compass files.
  *
- * @author Kris Wallsmith <kris.wallsmith@gmail.com>
+ * The Compass filter requires SASS >= 3.1.0.
+ *
+ * @author Maxime Thirouin <dev@moox.fr>
  */
-class ScssFilter extends SassFilter
+class CompassFilter extends SassFilter
 {
     public function __construct($baseDir, $sassPath = '/usr/bin/sass')
     {
         parent::__construct($baseDir, $sassPath);
 
-        $this->setScss(true);
+        $this->setCompass(true);
     }
 }
