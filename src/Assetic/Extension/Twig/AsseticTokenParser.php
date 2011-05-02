@@ -31,7 +31,7 @@ class AsseticTokenParser extends \Twig_TokenParser
      *
      * @param AssetFactory $factory    The asset factory
      * @param string       $tag        The tag name
-     * @param string       $output     The default output string
+     * @param string|array $output     The default output string or array of strings for generic asset
      * @param Boolean      $single     Whether to force a single asset
      * @param array        $extensions Additional attribute names to look for
      * @param Boolean      $generic    Whether this is a generic asset - type & template used
@@ -52,7 +52,6 @@ class AsseticTokenParser extends \Twig_TokenParser
         $filters = array();
         $name = null;
         $attributes = array(
-            'output'   => $this->output,
             'var_name' => 'asset_url',
         );
         if ($this->generic) {
@@ -128,6 +127,14 @@ class AsseticTokenParser extends \Twig_TokenParser
             $body = $this->parser->subparse($test, true);
 
             $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        }
+        
+        if (!isset($attributes['output'])) {
+            if (true === $this->generic) {
+                $attributes['output'] = $this->output[$type];
+            } else {
+                $attributes['output'] = $this->output;
+            }
         }
 
         if ($this->single && 1 < count($inputs)) {

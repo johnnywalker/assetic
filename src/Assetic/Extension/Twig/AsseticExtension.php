@@ -15,6 +15,9 @@ use Assetic\Factory\AssetFactory;
 
 class AsseticExtension extends \Twig_Extension
 {
+    protected static $defaultOutputs = array(
+        'css' => 'css/*.css', 'js' => 'js/*.js', 'img' => 'images/*'
+    );
     protected $factory;
     protected $functions;
 
@@ -35,10 +38,10 @@ class AsseticExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return array(
-            new AsseticTokenParser($this->factory, 'javascripts', 'js/*.js'),
-            new AsseticTokenParser($this->factory, 'stylesheets', 'css/*.css'),
-            new AsseticTokenParser($this->factory, 'image', 'images/*', true),
-            new AsseticTokenParser($this->factory, 'asset', 'css/*.css', false, array(), true),
+            new AsseticTokenParser($this->factory, 'javascripts', static::$defaultOutputs['js']),
+            new AsseticTokenParser($this->factory, 'stylesheets', static::$defaultOutputs['css']),
+            new AsseticTokenParser($this->factory, 'image', static::$defaultOutputs['img'], true),
+            new AsseticTokenParser($this->factory, 'asset', static::$defaultOutputs, false, array(), true),
             new AsseticTemplateTokenParser('asset_template'),
         );
     }
