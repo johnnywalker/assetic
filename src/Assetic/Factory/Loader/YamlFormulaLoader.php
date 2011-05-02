@@ -3,9 +3,7 @@
 namespace Assetic\Factory\Loader;
 
 use Assetic\Factory\Resource\ResourceInterface;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Config\Loader\FileLoader;
 
 class YamlFormulaLoader implements FormulaLoaderInterface
 {
@@ -67,11 +65,11 @@ class YamlFormulaLoader implements FormulaLoaderInterface
                     implode(', ', static::$configKeys[0])
                 ));
             }
-            if (in_array($key, static::$configKeys[1])) {
+            if (in_array($key, array_keys(static::$configKeys[1]))) {
                 if (!is_array($value)) {
                     throw new \InvalidArgumentException(sprintf(
                                     'Unexpected type for key "%s": "%s". Expected type: array.',
-                                    $key, gettype(value)));
+                                    $key, gettype($value)));
                 }
                 foreach ($value as $subKey => $subValue)
                 {
@@ -83,7 +81,14 @@ class YamlFormulaLoader implements FormulaLoaderInterface
                                                 static::$configKeys[1][$key])
                         ));
                     }
-                    if (!is_string($subValue)) {
+                    if ('options' === $key && 'debug' === $subKey) {
+                        if (!is_bool($subValue)) {
+                            throw new \InvalidArgumentException(sprintf(
+                               'Unexpected type for sub-key "debug": "%s". Expected type: boolean.',
+                               gettype($subValue)
+                            ));
+                        }
+                    } elseif (!is_string($subValue)) {
                         throw new \InvalidArgumentException(sprintf(
                            'Unexpected type for sub-key "%s": "%s". Expected type: string.',
                            $subKey, gettype($subValue)

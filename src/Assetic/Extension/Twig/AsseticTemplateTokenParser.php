@@ -1,7 +1,21 @@
 <?php
 
+/*
+ * This file is part of the Assetic package, an OpenSky project.
+ *
+ * (c) 2010-2011 OpenSky Project Inc
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Assetic\Extension\Twig;
 
+/**
+ * This class parses assetic templates in twig.
+ * 
+ * @author Johnny Walker <kallous@gmail.com>
+ */
 class AsseticTemplateTokenParser extends \Twig_TokenParser
 {
     private $tag;
@@ -65,7 +79,7 @@ class AsseticTemplateTokenParser extends \Twig_TokenParser
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         if (!ctype_alnum(AsseticTemplateHelperNode::camelize($attributes['name']))) {
-            throw new \Twig_Error_Syntaz(sprintf('Invalid characters in assetic template name: "%s".', $attributes['name']));
+            throw new \Twig_Error_Syntax(sprintf('Invalid characters in assetic template name: "%s".', $attributes['name']));
         }
 
         if (!$args['required'])

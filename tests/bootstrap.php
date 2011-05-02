@@ -29,6 +29,12 @@ spl_autoload_register(function($class)
             require_once $file;
             return true;
         }
+    } elseif (isset($_SERVER['SYMFONY_SRC']) && 0 === strpos($class, 'Symfony\\')) {
+        $file = $_SERVER['SYMFONY_SRC'] . '/' . str_replace('\\', '/', $class) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return true;
+        }
     }
 });
 

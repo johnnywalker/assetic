@@ -1,0 +1,11 @@
+## Asset formulae
+---
+foo1:
+    inputs:     'bar'
+
+foo2:
+    inputs:     ['bar1', 'bar2']
+    filters:    ['filter1', '?filter2']
+    options:
+        debug:  true
+        output: css/*.css

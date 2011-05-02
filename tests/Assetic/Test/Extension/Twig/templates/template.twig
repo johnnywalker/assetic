@@ -1,0 +1,16 @@
+{# assetic template test #}
+{% asset_template 'css_template' type='css' required=['id'] optional=['media'] %}
+<asset id="{{ id }}" type="css" media="{{ media|default('screen') }}" url="{{ asset_url }}" />
+{% endasset_template %}
+{% asset_template 'js_template' type='js' var_name='url' %}
+<asset type="js" url="{{ url }}" />
+{% endasset_template %}
+{% asset_template 'img_template' type='img' required=['alt'] %}
+<asset type="img" url="{{ asset_url }}" alt="{{ alt }}" />
+{% endasset_template %}
+<assets>
+    {% asset template='css_template' 'foo1' type='css' args={ 'id': 'no_media' } %}
+    {% asset template='css_template' 'foo2' type='css' args={ 'id': 'media', 'media': 'print' } %}
+    {% asset template='js_template' 'foo3' type='js' %}
+    {% asset template='img_template' 'foo4' type='img' args={ 'alt': 'an image' } %}
+</assets>

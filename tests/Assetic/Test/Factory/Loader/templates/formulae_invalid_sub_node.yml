@@ -1,0 +1,4 @@
+## Invalid sub node
+---
+foo:
+    filters: [true]

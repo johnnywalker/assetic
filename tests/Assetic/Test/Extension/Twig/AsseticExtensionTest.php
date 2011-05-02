@@ -168,6 +168,65 @@ class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($xml->asset));
         $this->assertStringEndsWith('.css', (string) $xml->asset[0]['url']);
     }
+    
+    public function testValidTemplates()
+    {
+        $xml = $this->renderXml('template.twig');
+        $this->assertEquals(4, count($xml->asset));
+        $this->assertEquals(array('no_media', 'screen'), array((string)$xml->asset[0]['id'], (string)$xml->asset[0]['media']));
+        $this->assertGreaterThan(0, strlen($xml->asset[0]['url']));
+        $this->assertEquals(array('media', 'print'), array((string)$xml->asset[1]['id'], (string)$xml->asset[1]['media']));
+        $this->assertGreaterThan(0, strlen($xml->asset[2]['url']));
+        $this->assertEquals('an image', (string)$xml->asset[3]['alt']);
+    }
+    
+    /**
+     * @expectedException Twig_Error_Syntax
+     */
+    public function testInvalidTemplateInvalidType()
+    {
+        $xml = $this->renderXml('template_invalid_type.twig');
+    }
+    
+    /**
+     * @expectedException Twig_Error_Syntax
+     */
+    public function testInvalidTemplateInvalidName()
+    {
+        $xml = $this->renderXml('template_invalid_name.twig');
+    }
+
+    /**
+     * @expectedException Twig_Error_Syntax
+     */
+    public function testInvalidTemplateUnexpectedToken()
+    {
+        $xml = $this->renderXml('template_unexpected_token.twig');
+    }
+
+    /**
+     * @expectedException Twig_Error_Runtime
+     */
+    public function testInvalidTemplateUnknownTemplate()
+    {
+        $xml = $this->renderXml('template_unknown.twig');
+    }
+
+    /**
+     * @expectedException Twig_Error_Runtime
+     */
+    public function testInvalidTemplateMissingRequired()
+    {
+        $xml = $this->renderXml('template_missing_required.twig');
+    }
+
+    /**
+     * @expectedException Twig_Error_Runtime
+     */
+    public function testInvalidTemplateUnknownArg()
+    {
+        $xml = $this->renderXml('template_unknown_arg.twig');
+    }
 
     private function renderXml($name, $context = array())
     {
