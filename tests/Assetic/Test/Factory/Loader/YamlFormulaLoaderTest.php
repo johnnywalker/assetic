@@ -26,6 +26,10 @@ class YamlFormulaLoaderTest extends \PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
+        if (!class_exists('Symfony\Component\Yaml\Yaml'))
+        {
+            $this->markTestSkipped('Symfony\'s Yaml is not installed');
+        }
         $this->loader = new YamlFormulaLoader();
     }
 
@@ -43,10 +47,6 @@ class YamlFormulaLoaderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(array('filter1','?filter2'), $formulae['foo2'][1]);
         $this->assertEquals(array('debug' => true, 'output' => 'css/*.css'), 
                 $formulae['foo2'][2]);
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
     }
 
     /**
